@@ -5,7 +5,6 @@ import android.os.Bundle;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentTransaction;
 
 public class MainActivity extends AppCompatActivity implements Sender, Receiver {
 
@@ -17,18 +16,20 @@ public class MainActivity extends AppCompatActivity implements Sender, Receiver 
     }
 
     private void openFirstFragment(int previousNumber) {
-        final Fragment firstFragment = FirstFragment.newInstance(previousNumber);
-        final FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        transaction.replace(R.id.container, firstFragment);
-        transaction.commit();
+        getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.container, FirstFragment.newInstance(previousNumber))
+                .commit();
     }
 
     private void openSecondFragment(int min, int max) {
-        final Fragment secondFragment = SecondFragment.newInstance(min, max);
-        final FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        transaction.replace(R.id.container, secondFragment);
-        transaction.addToBackStack(null);
-        transaction.commit();
+        getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.container,
+                        SecondFragment.newInstance(min, max),
+                        SecondFragment.class.getName()
+                )
+                .commit();
     }
 
     @Override
@@ -39,6 +40,17 @@ public class MainActivity extends AppCompatActivity implements Sender, Receiver 
     @Override
     public void send(int min, int max) {
         openSecondFragment(min, max);
+    }
+
+    @Override
+    public void onBackPressed() {
+        Fragment fragment =
+                getSupportFragmentManager().findFragmentByTag(SecondFragment.class.getName());
+        if (fragment == null) {
+            super.onBackPressed();
+        } else {
+            ((SecondFragment) fragment).backButtonClick();
+        }
     }
 
 }

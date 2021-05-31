@@ -38,11 +38,12 @@ class SecondFragment : Fragment() {
         val max = arguments?.getInt(MAX_VALUE_KEY) ?: 0
 
         result?.text = generate(min, max).toString()
-        val value = result?.text.toString().toInt()
         backButton?.setOnClickListener {
-            receiver.receive(value)
+            backButtonClick()
         }
     }
+
+    fun backButtonClick() = receiver.receive(result?.text.toString().toInt())
 
     private fun generate(min: Int, max: Int): Int {
         return (Math.random() * (max - min) + min).toInt()
