@@ -8,19 +8,20 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
+import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 
 class FirstFragment : Fragment() {
 
     private var generateButton: Button? = null
     private var previousResult: TextView? = null
-    private lateinit var minValue: EditText
-    private lateinit var maxValue: EditText
-    private lateinit var sender: Sender
+    private var minValue: EditText? = null
+    private var maxValue: EditText? = null
+    private var sender: Sender? = null
 
     override fun onAttach(context: Context) {
-        super.onAttach(context);
-        sender = context as Sender
+        super.onAttach(context)
+        if (context is Sender) sender = context
     }
 
     override fun onCreateView(
@@ -37,44 +38,47 @@ class FirstFragment : Fragment() {
         generateButton = view.findViewById(R.id.generate)
 
         val result = arguments?.getInt(PREVIOUS_RESULT_KEY)
-        previousResult?.text = "Previous result: ${result.toString()}"
+        previousResult?.text = resources.getString(
+            R.string.previous_result,
+            result
+        )
         minValue = view.findViewById(R.id.min_value)
         maxValue = view.findViewById(R.id.max_value)
 
         generateButton?.setOnClickListener {
-            val min = minValue.text.toString()
-            val max = maxValue.text.toString()
-            validateInputData(min, max)
+            val min = minValue?.text.toString()
+            val max = maxValue?.text.toString()
+            if (validateInputData(min, max)) {
+                sender?.send(min.toInt(), max.toInt())
+            }
         }
     }
 
-    private fun validateInputData(min: String, max: String) {
-        if (min.isEmpty() || max.isEmpty()) {
+    private fun validateInputData(min: String, max: String): Boolean {
+        return if (min.isEmpty() || max.isEmpty()) {
             ViewUtil.showMessage(
-                requireContext(), "Empty fields are not allowed!\n" +
-                        "Please, try again."
+                requireContext(), resources.getString(R.string.error_empty_fields)
             )
+            false
         } else if (max.toInt() < min.toInt()) {
             ViewUtil.showMessage(
                 requireContext(),
-                "The minimum value must be less than the maximum.\nPlease, try again."
+                resources.getString(R.string.error_incorrect_value)
             )
+            false
         } else {
-            sender.send(min.toInt(), max.toInt());
+            true
         }
     }
 
     companion object {
 
+        private const val PREVIOUS_RESULT_KEY = "PREVIOUS_RESULT"
+
         @JvmStatic
         fun newInstance(previousResult: Int): FirstFragment {
-            val fragment = FirstFragment()
-            val args = Bundle()
-            args.putInt(PREVIOUS_RESULT_KEY, previousResult)
-            fragment.arguments = args
-            return fragment
+            val args = bundleOf(PREVIOUS_RESULT_KEY to previousResult)
+            return FirstFragment().apply { arguments = args }
         }
-
-        private const val PREVIOUS_RESULT_KEY = "PREVIOUS_RESULT"
     }
 }

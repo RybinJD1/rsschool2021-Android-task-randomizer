@@ -1,3 +1,14 @@
 <resources>
     <string name="app_name">randomizer</string>
+    <string name="ok">OK</string>
+    <string name="warning">Warning</string>
+    <string name="invalid_data">Invalid data</string>
+    <string name="previous_result">Previous result: %1$d</string>
+    <string name="result">Result</string>
+    <string name="back">Back</string>
+    <string name="min">Min</string>
+    <string name="max">Max</string>
+    <string name="generate">Generate</string>
+    <string name="error_empty_fields">Empty fields are not allowed!\nPlease, try again.</string>
+    <string name="error_incorrect_value">The minimum value must be less than the maximum.\nPlease, try again.</string>
 </resources>

@@ -7,18 +7,18 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.TextView
+import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 
 class SecondFragment : Fragment() {
 
     private var backButton: Button? = null
     private var result: TextView? = null
-
-    private lateinit var receiver: Receiver
+    private var receiver: Receiver? = null
 
     override fun onAttach(context: Context) {
-        super.onAttach(context);
-        receiver = context as Receiver
+        super.onAttach(context)
+        if (context is Receiver) receiver = context
     }
 
     override fun onCreateView(
@@ -43,25 +43,22 @@ class SecondFragment : Fragment() {
         }
     }
 
-    fun backButtonClick() = receiver.receive(result?.text.toString().toInt())
+    fun backButtonClick() = receiver?.receive(result?.text.toString().toInt())
 
     private fun generate(min: Int, max: Int): Int {
-        return (Math.random() * (max - min) + min).toInt()
+        return (min..max).random()
     }
 
     companion object {
 
-        @JvmStatic
-        fun newInstance(min: Int, max: Int): SecondFragment {
-            val fragment = SecondFragment()
-            val args = Bundle()
-            args.putInt(MIN_VALUE_KEY, min)
-            args.putInt(MAX_VALUE_KEY, max)
-            fragment.arguments = args
-            return fragment
-        }
-
         private const val MIN_VALUE_KEY = "MIN_VALUE"
         private const val MAX_VALUE_KEY = "MAX_VALUE"
+
+        @JvmStatic
+        fun newInstance(min: Int, max: Int): SecondFragment {
+            val args = bundleOf(MIN_VALUE_KEY to min, MAX_VALUE_KEY to max)
+            return SecondFragment().apply { arguments = args }
+        }
+
     }
 }
